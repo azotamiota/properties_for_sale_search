@@ -1,4 +1,4 @@
-from onthemarket import Onthemarket
+from onthemarket_automation import Onthemarket
 import parameters
 
 print('\nThis program will detect if properties for sale in the UK \nadvertised at \
