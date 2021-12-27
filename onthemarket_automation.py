@@ -2,6 +2,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait as wait
@@ -9,7 +10,7 @@ import re
 import constants
 
 class Onthemarket(webdriver.Chrome):
-    def __init__(self, browser='C:\\webdrivers', teardown=False):
+    def __init__(self, browser='./chromedriver.exe', teardown=False):
         self.browser = browser
         self.teardown = teardown
         #super().__init__()
@@ -25,7 +26,7 @@ class Onthemarket(webdriver.Chrome):
         #self.execute_script('chrome.settingsPrivate.setDefaultZoom(0.75);')
         self.get('https://www.onthemarket.com/')
         self.maximize_window()
-        cookies = self.find_element_by_css_selector('#cookie-notification > p > span.cookie-actions > button > span')
+        cookies = self.find_element_by_css_selector('#cookie-notification > p > span.cookie-actions > button')
         cookies.click()
 
     def location(self, loc):
@@ -33,13 +34,15 @@ class Onthemarket(webdriver.Chrome):
         location = self.find_element_by_id("search-location-sale")
         location.send_keys(self.loc)
         time.sleep(1)
-        first = self.find_element_by_xpath('//*[@id="homesearch-for-sale"]/div/div[1]/div/ul/li[1]')
-        noresult = self.find_element_by_xpath('//*[@id="homesearch-for-sale"]/div/div[1]/div/ul/li/span')
-        if noresult.text == 'No results found':
+        first = self.find_element_by_class_name('landing-page-search-results')
+        #print('The result:',first.text)
+        resultList = first.text.split('\n')
+        #noresult = self.find_element_by_class_name('landing-page-search-results')
+        if first.text == 'No results found':
             print('No such location found. Please check your spelling, restart the program and try again')
             self.quit()
             exit()
-        elif input('Location found: ' + first.text + '\nDo you want to proceed? (y/n): ').lower() == 'y':
+        elif input('Location found: ' + resultList[0] + '\nDo you want to proceed? (y/n): ').lower() == 'y':
             first.click()
             location.submit()
         else:
